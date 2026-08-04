@@ -138,11 +138,15 @@
 
       const emailEl = document.getElementById('contactEmail');
       const phoneEl = document.getElementById('contactPhone');
+      const instaEl = document.getElementById('contactInstagram');
       if (data.contact) {
         emailEl.textContent = data.contact.email || '';
         emailEl.href = data.contact.email ? 'mailto:' + data.contact.email : '#';
         phoneEl.textContent = data.contact.phone || '';
         phoneEl.href = data.contact.phone ? 'tel:' + data.contact.phone : '#';
+        instaEl.textContent = data.contact.instagram ? 'Instagram' : '';
+        instaEl.href = data.contact.instagram || '#';
+        instaEl.style.display = data.contact.instagram ? '' : 'none';
       }
 
       allCategories = data.categories || [];
