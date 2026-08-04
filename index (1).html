@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moderna:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { gold: '#D4AF37', dark: '#0a0a0a', light: '#e5e5e5', muted: '#8a8a8a', border: '#2a2a2a' }
+        },
+        fontFamily: { serif: ['"Bodoni Moderna"', 'serif'], sans: ['Inter', 'sans-serif'] },
+        spacing: { wrap: '1.5rem', content: '1.5rem' }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e5e5e5; }
+  .font-serif { font-family: 'Bodoni Moderna', serif; }
+  .nav-link-underline { position: relative; }
+  .nav-link-underline::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px;
+    background-color: currentColor; transform: scaleX(0); transform-origin: right;
+    transition: transform 0.6s cubic-bezier(0.43,0.145,0.285,1);
+  }
+  .nav-link-underline:hover::after { transform: scaleX(1); transform-origin: left; }
+  .cat-btn.active { color: #e5e5e5; }
+  .cat-btn:not(.active) { color: #8a8a8a; }
+  .aspect-portrait { aspect-ratio: 3/4; }
+  .gallery-img { transition: transform 1s cubic-bezier(.165,.84,.44,1); }
+  .group:hover .gallery-img { transform: scale(1.05); }
+</style>
+</head>
+<body class="antialiased bg-brand-dark text-brand-light selection:bg-brand-gold selection:text-brand-dark">
+
+<!-- Nav -->
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-7xl">
+  <div class="flex items-center justify-between px-4 md:px-6 py-3 bg-brand-dark/80 backdrop-blur-md border border-brand-border rounded-full">
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#" class="nav-link-underline text-xs uppercase tracking-widest font-medium">Home</a>
+      <a href="#gallery" class="nav-link-underline text-xs uppercase tracking-widest font-medium">Gallery</a>
+      <a href="#about" class="nav-link-underline text-xs uppercase tracking-widest font-medium">About</a>
+      <a href="#contact" class="nav-link-underline text-xs uppercase tracking-widest font-medium">Contact</a>
+    </div>
+    <div class="md:hidden flex items-center">
+      <span class="text-[10px] uppercase tracking-[0.2em] font-bold">PORTFOLIO</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-[10px] uppercase tracking-widest text-brand-muted">Gallery</span>
+      <div class="w-2 h-2 rounded-full bg-brand-gold animate-pulse"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="relative h-[800px] md:h-[900px] flex flex-col justify-end px-wrap pb-12 overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <img id="heroImg" class="w-full h-full object-cover bg-zinc-900" src="" alt="Hero photo" />
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/20 to-transparent"></div>
+  </div>
+  <div class="relative z-10 max-w-7xl mx-auto w-full">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+      <h1 class="text-xs uppercase tracking-[0.2em] font-medium">PORTFOLIO</h1>
+      <span class="text-xs uppercase tracking-[0.2em] font-medium">VISUAL WORK</span>
+    </div>
+  </div>
+</header>
+
+<main id="gallery">
+  <!-- Gallery -->
+  <section class="py-24 md:py-32 px-wrap">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-start mb-12 md:mb-24 gap-8">
+        <h2 class="text-xs uppercase tracking-[0.2em] font-medium">CURATED WORK</h2>
+        <div id="catNav" class="flex flex-wrap gap-4 md:gap-8"></div>
+      </div>
+      <div id="galleryGrid" class="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-content"></div>
+      <p id="galleryEmpty" class="hidden text-sm text-brand-muted">No photos yet in this category.</p>
+    </div>
+  </section>
+
+  <!-- About (static) -->
+  <section id="about" class="py-24 md:py-32 px-wrap border-t border-brand-border">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-8">
+        <h3 class="text-4xl md:text-6xl font-serif leading-tight tracking-tighter uppercase">
+          the quiet <span class="italic lowercase">search</span> for<br>
+          quiet <span class="italic lowercase">light</span>
+        </h3>
+      </div>
+      <div class="md:col-span-4 flex flex-col justify-end">
+        <p class="text-sm leading-relaxed text-brand-muted mb-8">
+          A visual storyteller working across editorial, landscape, and portrait work — frames that balance mood with precision.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer / Contact -->
+<footer id="contact" class="px-wrap pb-12 border-t border-brand-border pt-24 md:pt-32">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-6xl md:text-9xl font-serif uppercase tracking-tighter mb-16 md:mb-24">PORTFOLIO</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 py-16 md:py-24 border-b border-brand-border">
+      <div class="md:col-span-4 space-y-4">
+        <span class="text-[10px] uppercase tracking-widest text-brand-muted block">Contact</span>
+        <a id="contactEmail" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
+        <a id="contactPhone" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row justify-between items-center py-8 text-[10px] uppercase tracking-widest text-brand-muted gap-4">
+      <span>© 2026 Portfolio</span>
+      <span>All Rights Reserved</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ---- CONFIG: paste your deployed Apps Script Web App URL here ----
+  const APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE';
+
+  let allCategories = [];
+
+  async function loadSite() {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL);
+      const data = await res.json();
+
+      if (data.hero) document.getElementById('heroImg').src = data.hero;
+
+      const emailEl = document.getElementById('contactEmail');
+      const phoneEl = document.getElementById('contactPhone');
+      if (data.contact) {
+        emailEl.textContent = data.contact.email || '';
+        emailEl.href = data.contact.email ? 'mailto:' + data.contact.email : '#';
+        phoneEl.textContent = data.contact.phone || '';
+        phoneEl.href = data.contact.phone ? 'tel:' + data.contact.phone : '#';
+      }
+
+      allCategories = data.categories || [];
+      renderCategoryNav();
+      if (allCategories.length) renderGallery(allCategories[0].name);
+    } catch (err) {
+      console.error('Failed to load site data:', err);
+      document.getElementById('galleryEmpty').classList.remove('hidden');
+      document.getElementById('galleryEmpty').textContent = 'Could not load content. Check the Apps Script URL.';
+    }
+  }
+
+  function renderCategoryNav() {
+    const nav = document.getElementById('catNav');
+    nav.innerHTML = '';
+    allCategories.forEach((cat, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = cat.name;
+      btn.className = 'cat-btn nav-link-underline text-xs uppercase tracking-widest font-medium' + (i === 0 ? ' active' : '');
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGallery(cat.name);
+      });
+      nav.appendChild(btn);
+    });
+  }
+
+  function renderGallery(categoryName) {
+    const grid = document.getElementById('galleryGrid');
+    const empty = document.getElementById('galleryEmpty');
+    grid.innerHTML = '';
+    const cat = allCategories.find(c => c.name === categoryName);
+    const photos = (cat && cat.photos) || [];
+
+    if (!photos.length) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    photos.forEach(photo => {
+      const wrap = document.createElement('div');
+      wrap.className = 'group';
+      wrap.innerHTML = `
+        <div class="aspect-portrait overflow-hidden rounded-xl shadow-2xl shadow-black/50">
+          <img class="gallery-img w-full h-full object-cover" src="${photo.url}" alt="${photo.name}" loading="lazy" />
+        </div>`;
+      grid.appendChild(wrap);
+    });
+  }
+
+  loadSite();
+</script>
+</body>
+</html>
