@@ -95,8 +95,8 @@
   </div>
   <div class="relative z-10 max-w-7xl mx-auto w-full">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-      <h1 class="text-xs uppercase tracking-[0.2em] font-medium">PORTFOLIO</h1>
-      <span class="text-xs uppercase tracking-[0.2em] font-medium">VISUAL WORK</span>
+      <h1 id="txt-heroTitle" class="text-xs uppercase tracking-[0.2em] font-medium">PORTFOLIO</h1>
+      <span id="txt-heroSubtitle" class="text-xs uppercase tracking-[0.2em] font-medium">VISUAL WORK</span>
     </div>
   </div>
 </header>
@@ -106,7 +106,7 @@
   <section class="py-24 md:py-32 px-wrap">
     <div class="max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-start mb-12 md:mb-24 gap-8">
-        <h2 class="text-xs uppercase tracking-[0.2em] font-medium">CURATED WORK</h2>
+        <h2 id="txt-galleryHeading" class="text-xs uppercase tracking-[0.2em] font-medium">CURATED WORK</h2>
         <div id="catNav" class="flex flex-wrap gap-4 md:gap-8"></div>
       </div>
       <div id="galleryGrid" class="grid grid-cols-1 md:grid-cols-3 gap-y-12 gap-x-content"></div>
@@ -118,13 +118,13 @@
   <section id="about" class="py-24 md:py-32 px-wrap border-t border-brand-border">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
       <div class="md:col-span-8">
-        <h3 class="text-4xl md:text-6xl font-serif leading-tight tracking-tighter uppercase">
+        <h3 id="txt-aboutHeading" class="text-4xl md:text-6xl font-serif leading-tight tracking-tighter uppercase">
           the quiet <span class="italic lowercase">search</span> for<br>
           quiet <span class="italic lowercase">light</span>
         </h3>
       </div>
       <div class="md:col-span-4 flex flex-col justify-end">
-        <p class="text-sm leading-relaxed text-brand-muted mb-8">
+        <p id="txt-aboutText" class="text-sm leading-relaxed text-brand-muted mb-8">
           A visual storyteller working across editorial, landscape, and portrait work — frames that balance mood with precision.
         </p>
       </div>
@@ -135,17 +135,17 @@
 <!-- Footer / Contact -->
 <footer id="contact" class="px-wrap pb-12 border-t border-brand-border pt-24 md:pt-32">
   <div class="max-w-7xl mx-auto">
-    <h2 class="text-6xl md:text-9xl font-serif uppercase tracking-tighter mb-16 md:mb-24">PORTFOLIO</h2>
+    <h2 id="txt-footerHeading" class="text-6xl md:text-9xl font-serif uppercase tracking-tighter mb-16 md:mb-24">PORTFOLIO</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 py-16 md:py-24 border-b border-brand-border">
       <div class="md:col-span-4 space-y-4">
-        <span class="text-[10px] uppercase tracking-widest text-brand-muted block">Contact</span>
+        <span id="txt-contactLabel" class="text-[10px] uppercase tracking-widest text-brand-muted block">Contact</span>
         <a id="contactEmail" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
         <a id="contactPhone" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
         <a id="contactInstagram" href="#" target="_blank" rel="noopener noreferrer" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
       </div>
     </div>
     <div class="flex flex-col md:flex-row justify-between items-center py-8 text-[10px] uppercase tracking-widest text-brand-muted gap-4">
-      <span>© 2026 Portfolio</span>
+      <span id="txt-footerCopyright">© 2026 Portfolio</span>
       <span>All Rights Reserved</span>
     </div>
   </div>
@@ -202,6 +202,13 @@
         <div id="editCategories" class="space-y-4"></div>
       </div>
 
+      <!-- Text & Layout -->
+      <div class="mb-6">
+        <p class="text-[10px] uppercase tracking-widest text-brand-muted mb-1">Text &amp; Layout</p>
+        <p class="text-[10px] text-brand-muted mb-2">Use *text* for bold, _text_ for italic, new line for line break.</p>
+        <div id="editStyles" class="space-y-3"></div>
+      </div>
+
       <div class="flex gap-3">
         <button id="saveBtn" class="admin-btn flex-1">Save Changes</button>
         <button id="cancelBtn" class="admin-btn-secondary">Cancel</button>
@@ -217,12 +224,48 @@
   // ============================================================
   const WORKER_URL = 'https://kaad-portraits.sk6594246.workers.dev';
 
+  // Configurable text elements: id -> { defaultFontSize, defaultAlign, defaultContent, label, allowHtml }
+  const STYLE_KEYS = {
+    heroTitle:        { label: 'Hero Title (PORTFOLIO)',         defaultFontSize: '0.75rem', defaultAlign: 'left',  defaultContent: 'PORTFOLIO' },
+    heroSubtitle:      { label: 'Hero Subtitle (VISUAL WORK)',    defaultFontSize: '0.75rem', defaultAlign: 'right', defaultContent: 'VISUAL WORK' },
+    galleryHeading:    { label: 'Gallery Heading (CURATED WORK)', defaultFontSize: '0.75rem', defaultAlign: 'left',  defaultContent: 'CURATED WORK' },
+    aboutHeading:      { label: 'About Heading',                  defaultFontSize: '2.5rem',  defaultAlign: 'left',  defaultContent: 'the quiet *search* for\nquiet *light*' },
+    aboutText:         { label: 'About Paragraph',                 defaultFontSize: '0.875rem',defaultAlign: 'left', defaultContent: 'A visual storyteller working across editorial, landscape, and portrait work — frames that balance mood with precision.' },
+    footerHeading:     { label: 'Footer Heading (PORTFOLIO)',     defaultFontSize: '4rem',    defaultAlign: 'left',  defaultContent: 'PORTFOLIO' },
+    contactLabel:      { label: 'Contact Label',                   defaultFontSize: '0.625rem',defaultAlign: 'left', defaultContent: 'Contact' },
+    footerCopyright:   { label: 'Footer Copyright',                 defaultFontSize: '0.625rem',defaultAlign: 'left',defaultContent: '© 2026 Portfolio' }
+  };
+
+  // Mini-markdown: *bold*, _italic_, \n -> <br>. Escapes HTML first to stay safe.
+  function renderMiniMarkdown(raw) {
+    let text = escapeHtml(raw == null ? '' : String(raw));
+    text = text.replace(/\*(.+?)\*/g, '<strong>$1</strong>');
+    text = text.replace(/_(.+?)_/g, '<em>$1</em>');
+    text = text.replace(/\n/g, '<br>');
+    return text;
+  }
+
   // Current data loaded from KV (kept in memory for editing)
   let siteData = {
     hero: '',
     contact: { email: '', phone: '', instagram: '' },
-    categories: []
+    categories: [],
+    styles: {}
   };
+
+  // Apply fontSize + textAlign + content (parsed as mini-markdown) to every configured element
+  function applyStyles() {
+    Object.keys(STYLE_KEYS).forEach(key => {
+      const el = document.getElementById('txt-' + key);
+      if (!el) return;
+      const cfg = STYLE_KEYS[key];
+      const saved = (siteData.styles && siteData.styles[key]) || {};
+      el.style.fontSize = saved.fontSize || cfg.defaultFontSize;
+      el.style.textAlign = saved.textAlign || cfg.defaultAlign;
+      const content = (saved.content != null && saved.content !== '') ? saved.content : cfg.defaultContent;
+      el.innerHTML = renderMiniMarkdown(content);
+    });
+  }
 
   // ------------------------------------------------------------
   // 1. LOAD SITE DATA (one-time on page open)
@@ -234,6 +277,8 @@
       const data = await res.json();
 
       siteData = data;
+      if (!siteData.styles) siteData.styles = {};
+      applyStyles();
 
       // Hero
       if (data.hero) document.getElementById('heroImg').src = data.hero;
@@ -382,6 +427,40 @@
     (siteData.categories || []).forEach((cat, catIndex) => {
       container.appendChild(makeCategoryBlock(cat, catIndex));
     });
+
+    fillStylesEditor();
+  }
+
+  // Build the Text & Layout rows (content textarea + font size input + align dropdown per element)
+  function fillStylesEditor() {
+    const container = document.getElementById('editStyles');
+    container.innerHTML = '';
+    const savedStyles = siteData.styles || {};
+
+    Object.keys(STYLE_KEYS).forEach(key => {
+      const cfg = STYLE_KEYS[key];
+      const saved = savedStyles[key] || {};
+      const fontSize = saved.fontSize || cfg.defaultFontSize;
+      const align = saved.textAlign || cfg.defaultAlign;
+      const content = (saved.content != null && saved.content !== '') ? saved.content : cfg.defaultContent;
+
+      const row = document.createElement('div');
+      row.className = 'border border-brand-border rounded-lg p-2 space-y-2';
+      row.dataset.styleKey = key;
+      row.innerHTML = `
+        <span class="text-xs text-brand-muted block">${escapeHtml(cfg.label)}</span>
+        <textarea class="admin-input style-content" rows="2">${escapeHtml(content)}</textarea>
+        <div class="flex gap-2 items-center">
+          <input type="text" class="admin-input style-fontsize flex-1" value="${escapeHtml(fontSize)}" placeholder="e.g. 1rem" />
+          <select class="admin-input style-align" style="max-width:110px">
+            <option value="left"${align === 'left' ? ' selected' : ''}>Left</option>
+            <option value="center"${align === 'center' ? ' selected' : ''}>Center</option>
+            <option value="right"${align === 'right' ? ' selected' : ''}>Right</option>
+          </select>
+        </div>
+      `;
+      container.appendChild(row);
+    });
   }
 
   function makeCategoryBlock(cat, catIndex) {
@@ -441,8 +520,21 @@
         phone: document.getElementById('editPhone').value.trim(),
         instagram: document.getElementById('editInstagram').value.trim()
       },
-      categories: []
+      categories: [],
+      styles: {}
     };
+
+    document.querySelectorAll('#editStyles > div').forEach(row => {
+      const key = row.dataset.styleKey;
+      const content = row.querySelector('.style-content').value;
+      const fontSize = row.querySelector('.style-fontsize').value.trim();
+      const textAlign = row.querySelector('.style-align').value;
+      newData.styles[key] = {
+        content,
+        fontSize: fontSize || STYLE_KEYS[key].defaultFontSize,
+        textAlign
+      };
+    });
 
     document.querySelectorAll('#editCategories > div').forEach(block => {
       const name = block.querySelector('.cat-name').value.trim();
@@ -474,6 +566,7 @@
 
       // Success → update local data + re-render page
       siteData = newData;
+      applyStyles();
       if (siteData.hero) document.getElementById('heroImg').src = siteData.hero;
 
       // Update contact
