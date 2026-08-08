@@ -36,6 +36,34 @@
   .aspect-portrait { aspect-ratio: 3/4; }
   .gallery-img { transition: transform 1s cubic-bezier(.165,.84,.44,1); }
   .group:hover .gallery-img { transform: scale(1.05); }
+
+  /* Admin modal */
+  #adminOverlay {
+    display: none;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  #adminOverlay.open { display: flex; }
+  #adminPanel {
+    background: #111; border: 1px solid #2a2a2a; border-radius: 16px;
+    width: 95%; max-width: 640px; max-height: 90vh; overflow-y: auto;
+    padding: 1.5rem;
+  }
+  .admin-input {
+    width: 100%; background: #0a0a0a; border: 1px solid #2a2a2a;
+    color: #e5e5e5; padding: 0.5rem 0.75rem; border-radius: 8px;
+    font-size: 0.875rem;
+  }
+  .admin-input:focus { outline: none; border-color: #D4AF37; }
+  .admin-btn {
+    background: #D4AF37; color: #0a0a0a; font-weight: 600;
+    padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;
+  }
+  .admin-btn:hover { opacity: 0.9; }
+  .admin-btn-secondary {
+    background: transparent; border: 1px solid #2a2a2a; color: #e5e5e5;
+    padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem;
+  }
 </style>
 </head>
 <body class="antialiased bg-brand-dark text-brand-light selection:bg-brand-gold selection:text-brand-dark">
@@ -123,19 +151,94 @@
   </div>
 </footer>
 
+<!-- Tiny Admin button (bottom-right) -->
+<button id="adminBtn" title="Admin"
+  class="fixed bottom-6 right-6 z-40 w-10 h-10 rounded-full bg-brand-dark/80 border border-brand-border
+         text-brand-muted hover:text-brand-gold hover:border-brand-gold transition-colors
+         flex items-center justify-center text-xs uppercase tracking-widest">
+  ✎
+</button>
+
+<!-- Admin Overlay / Modal -->
+<div id="adminOverlay">
+  <div id="adminPanel">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-sm uppercase tracking-widest font-medium">Admin Panel</h3>
+      <button id="adminClose" class="text-brand-muted hover:text-brand-light text-lg">×</button>
+    </div>
+
+    <!-- Step 1: PIN -->
+    <div id="pinStep">
+      <p class="text-sm text-brand-muted mb-3">Enter admin PIN</p>
+      <input id="pinInput" type="password" class="admin-input mb-4" placeholder="PIN" autocomplete="off" />
+      <button id="pinSubmit" class="admin-btn w-full">Unlock</button>
+      <p id="pinError" class="text-red-400 text-xs mt-3 hidden">Wrong PIN</p>
+    </div>
+
+    <!-- Step 2: Editor (hidden until PIN is correct) -->
+    <div id="editorStep" class="hidden">
+      <p class="text-xs text-brand-muted mb-4">Edit any field below, then click Save.</p>
+
+      <!-- Hero -->
+      <div class="mb-6">
+        <label class="text-[10px] uppercase tracking-widest text-brand-muted block mb-1">Hero Image URL</label>
+        <input id="editHero" type="url" class="admin-input" placeholder="https://..." />
+      </div>
+
+      <!-- Contact -->
+      <div class="mb-6 space-y-3">
+        <p class="text-[10px] uppercase tracking-widest text-brand-muted">Contact</p>
+        <input id="editEmail" type="email" class="admin-input" placeholder="Email" />
+        <input id="editPhone" type="text" class="admin-input" placeholder="Phone" />
+        <input id="editInstagram" type="url" class="admin-input" placeholder="Instagram URL" />
+      </div>
+
+      <!-- Categories / Albums -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-[10px] uppercase tracking-widest text-brand-muted">Albums / Categories</p>
+          <button id="addCategory" class="admin-btn-secondary text-xs">+ Add Album</button>
+        </div>
+        <div id="editCategories" class="space-y-4"></div>
+      </div>
+
+      <div class="flex gap-3">
+        <button id="saveBtn" class="admin-btn flex-1">Save Changes</button>
+        <button id="cancelBtn" class="admin-btn-secondary">Cancel</button>
+      </div>
+      <p id="saveMsg" class="text-xs mt-3 hidden"></p>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ---- CONFIG: paste your deployed Apps Script Web App URL here ---
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNXfvhif3fvX-O-lBLcZJn7dmAgCvqu3zjVVHcbYf6Zr3z1b5mrGS_T4QhhdIEEw/exec';
+  // ============================================================
+  // CONFIG — paste your Cloudflare Worker URL here after deploy
+  // ============================================================
+  const WORKER_URL = 'https://kaad-portraits.sk6594246.workers.dev';
 
-  let allCategories = [];
+  // Current data loaded from KV (kept in memory for editing)
+  let siteData = {
+    hero: '',
+    contact: { email: '', phone: '', instagram: '' },
+    categories: []
+  };
 
+  // ------------------------------------------------------------
+  // 1. LOAD SITE DATA (one-time on page open)
+  // ------------------------------------------------------------
   async function loadSite() {
     try {
-      const res = await fetch(APPS_SCRIPT_URL);
+      const res = await fetch(WORKER_URL);
+      if (!res.ok) throw new Error('Worker returned ' + res.status);
       const data = await res.json();
 
+      siteData = data;
+
+      // Hero
       if (data.hero) document.getElementById('heroImg').src = data.hero;
 
+      // Contact
       const emailEl = document.getElementById('contactEmail');
       const phoneEl = document.getElementById('contactPhone');
       const instaEl = document.getElementById('contactInstagram');
@@ -149,20 +252,22 @@
         instaEl.style.display = data.contact.instagram ? '' : 'none';
       }
 
-      allCategories = data.categories || [];
+      // Gallery
       renderCategoryNav();
-      if (allCategories.length) renderGallery(allCategories[0].name);
+      if (data.categories && data.categories.length) {
+        renderGallery(data.categories[0].name);
+      }
     } catch (err) {
       console.error('Failed to load site data:', err);
       document.getElementById('galleryEmpty').classList.remove('hidden');
-      document.getElementById('galleryEmpty').textContent = 'Could not load content. Check the Apps Script URL.';
+      document.getElementById('galleryEmpty').textContent = 'Could not load content. Check the Worker URL.';
     }
   }
 
   function renderCategoryNav() {
     const nav = document.getElementById('catNav');
     nav.innerHTML = '';
-    allCategories.forEach((cat, i) => {
+    (siteData.categories || []).forEach((cat, i) => {
       const btn = document.createElement('button');
       btn.textContent = cat.name;
       btn.className = 'cat-btn nav-link-underline text-xs uppercase tracking-widest font-medium' + (i === 0 ? ' active' : '');
@@ -179,7 +284,7 @@
     const grid = document.getElementById('galleryGrid');
     const empty = document.getElementById('galleryEmpty');
     grid.innerHTML = '';
-    const cat = allCategories.find(c => c.name === categoryName);
+    const cat = (siteData.categories || []).find(c => c.name === categoryName);
     const photos = (cat && cat.photos) || [];
 
     if (!photos.length) {
@@ -193,12 +298,220 @@
       wrap.className = 'group';
       wrap.innerHTML = `
         <div class="aspect-portrait overflow-hidden rounded-xl shadow-2xl shadow-black/50">
-          <img class="gallery-img w-full h-full object-cover" src="${photo.url}" alt="${photo.name}" loading="lazy" />
+          <img class="gallery-img w-full h-full object-cover" src="${photo.url}" alt="${photo.name || ''}" loading="lazy" />
         </div>`;
       grid.appendChild(wrap);
     });
   }
 
+  // ------------------------------------------------------------
+  // 2. ADMIN UI
+  // ------------------------------------------------------------
+  const overlay   = document.getElementById('adminOverlay');
+  const pinStep   = document.getElementById('pinStep');
+  const editorStep= document.getElementById('editorStep');
+  const pinInput  = document.getElementById('pinInput');
+  const pinError  = document.getElementById('pinError');
+  const saveMsg   = document.getElementById('saveMsg');
+
+  // Open admin
+  document.getElementById('adminBtn').addEventListener('click', () => {
+    pinStep.classList.remove('hidden');
+    editorStep.classList.add('hidden');
+    pinInput.value = '';
+    pinError.classList.add('hidden');
+    saveMsg.classList.add('hidden');
+    overlay.classList.add('open');
+    pinInput.focus();
+  });
+
+  // Close admin
+  function closeAdmin() {
+    overlay.classList.remove('open');
+  }
+  document.getElementById('adminClose').addEventListener('click', closeAdmin);
+  document.getElementById('cancelBtn').addEventListener('click', closeAdmin);
+
+  // PIN unlock
+  document.getElementById('pinSubmit').addEventListener('click', tryPin);
+  pinInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryPin(); });
+
+  async function tryPin() {
+    const pin = pinInput.value.trim();
+    if (!pin) return;
+
+    // We do a "test save" of current data just to validate the PIN.
+    // (Worker only returns 401 if PIN is wrong.)
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, data: siteData })
+      });
+
+      if (res.status === 401) {
+        pinError.classList.remove('hidden');
+        return;
+      }
+      if (!res.ok) {
+        pinError.textContent = 'Server error. Try again.';
+        pinError.classList.remove('hidden');
+        return;
+      }
+
+      // PIN correct → show editor filled with current data
+      pinError.classList.add('hidden');
+      pinStep.classList.add('hidden');
+      editorStep.classList.remove('hidden');
+      fillEditor();
+    } catch (err) {
+      pinError.textContent = 'Network error';
+      pinError.classList.remove('hidden');
+    }
+  }
+
+  // Fill the editor form with current siteData
+  function fillEditor() {
+    document.getElementById('editHero').value = siteData.hero || '';
+    document.getElementById('editEmail').value = (siteData.contact && siteData.contact.email) || '';
+    document.getElementById('editPhone').value = (siteData.contact && siteData.contact.phone) || '';
+    document.getElementById('editInstagram').value = (siteData.contact && siteData.contact.instagram) || '';
+
+    const container = document.getElementById('editCategories');
+    container.innerHTML = '';
+    (siteData.categories || []).forEach((cat, catIndex) => {
+      container.appendChild(makeCategoryBlock(cat, catIndex));
+    });
+  }
+
+  function makeCategoryBlock(cat, catIndex) {
+    const block = document.createElement('div');
+    block.className = 'border border-brand-border rounded-lg p-3 space-y-2';
+    block.dataset.catIndex = catIndex;
+
+    block.innerHTML = `
+      <div class="flex gap-2 items-center">
+        <input type="text" class="admin-input cat-name flex-1" value="${escapeHtml(cat.name || '')}" placeholder="Album name" />
+        <button type="button" class="admin-btn-secondary text-xs remove-cat">Remove</button>
+      </div>
+      <div class="photos space-y-2"></div>
+      <button type="button" class="admin-btn-secondary text-xs add-photo">+ Add Photo URL</button>
+    `;
+
+    const photosDiv = block.querySelector('.photos');
+    (cat.photos || []).forEach(photo => {
+      photosDiv.appendChild(makePhotoRow(photo));
+    });
+
+    block.querySelector('.remove-cat').addEventListener('click', () => block.remove());
+    block.querySelector('.add-photo').addEventListener('click', () => {
+      photosDiv.appendChild(makePhotoRow({ url: '', name: '' }));
+    });
+
+    return block;
+  }
+
+  function makePhotoRow(photo) {
+    const row = document.createElement('div');
+    row.className = 'flex gap-2';
+    row.innerHTML = `
+      <input type="url" class="admin-input photo-url flex-1" value="${escapeHtml(photo.url || '')}" placeholder="Photo URL" />
+      <input type="text" class="admin-input photo-name" style="max-width:120px" value="${escapeHtml(photo.name || '')}" placeholder="Name" />
+      <button type="button" class="admin-btn-secondary text-xs remove-photo">×</button>
+    `;
+    row.querySelector('.remove-photo').addEventListener('click', () => row.remove());
+    return row;
+  }
+
+  // Add new empty category
+  document.getElementById('addCategory').addEventListener('click', () => {
+    const container = document.getElementById('editCategories');
+    container.appendChild(makeCategoryBlock({ name: 'New Album', photos: [] }, container.children.length));
+  });
+
+  // Save changes
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const pin = pinInput.value.trim(); // still have the PIN from unlock
+
+    // Build new data object from form
+    const newData = {
+      hero: document.getElementById('editHero').value.trim(),
+      contact: {
+        email: document.getElementById('editEmail').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        instagram: document.getElementById('editInstagram').value.trim()
+      },
+      categories: []
+    };
+
+    document.querySelectorAll('#editCategories > div').forEach(block => {
+      const name = block.querySelector('.cat-name').value.trim();
+      if (!name) return;
+      const photos = [];
+      block.querySelectorAll('.photos > div').forEach(row => {
+        const url = row.querySelector('.photo-url').value.trim();
+        const pname = row.querySelector('.photo-name').value.trim();
+        if (url) photos.push({ url, name: pname });
+      });
+      newData.categories.push({ name, photos });
+    });
+
+    saveMsg.classList.add('hidden');
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, data: newData })
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        saveMsg.textContent = result.error || 'Save failed';
+        saveMsg.classList.remove('hidden');
+        saveMsg.style.color = '#f87171';
+        return;
+      }
+
+      // Success → update local data + re-render page
+      siteData = newData;
+      if (siteData.hero) document.getElementById('heroImg').src = siteData.hero;
+
+      // Update contact
+      const emailEl = document.getElementById('contactEmail');
+      const phoneEl = document.getElementById('contactPhone');
+      const instaEl = document.getElementById('contactInstagram');
+      emailEl.textContent = siteData.contact.email || '';
+      emailEl.href = siteData.contact.email ? 'mailto:' + siteData.contact.email : '#';
+      phoneEl.textContent = siteData.contact.phone || '';
+      phoneEl.href = siteData.contact.phone ? 'tel:' + siteData.contact.phone : '#';
+      instaEl.textContent = siteData.contact.instagram ? 'Instagram' : '';
+      instaEl.href = siteData.contact.instagram || '#';
+      instaEl.style.display = siteData.contact.instagram ? '' : 'none';
+
+      renderCategoryNav();
+      if (siteData.categories.length) renderGallery(siteData.categories[0].name);
+
+      saveMsg.textContent = 'Saved!';
+      saveMsg.style.color = '#4ade80';
+      saveMsg.classList.remove('hidden');
+
+      setTimeout(closeAdmin, 1200);
+    } catch (err) {
+      saveMsg.textContent = 'Network error';
+      saveMsg.style.color = '#f87171';
+      saveMsg.classList.remove('hidden');
+    }
+  });
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  // Start
   loadSite();
 </script>
 </body>
