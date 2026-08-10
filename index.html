@@ -55,8 +55,9 @@
   .cat-btn.active { color: #e5e5e5; border-color: #D4AF37; }
   .cat-btn:not(.active) { color: #8a8a8a; border-color: transparent; }
   .aspect-portrait { aspect-ratio: 3/4; }
-  .gallery-img { transition: transform 1.2s cubic-bezier(.165,.84,.44,1), filter 0.5s ease; }
-  .group:hover .gallery-img { transform: scale(1.04); filter: brightness(1.05); }
+  .gallery-img { transition: transform 1.2s cubic-bezier(.165,.84,.44,1), filter 0.5s ease, opacity 0.6s ease; opacity: 0; filter: blur(8px); }
+  .gallery-img.loaded { opacity: 1; filter: blur(0); }
+  .group:hover .gallery-img.loaded { transform: scale(1.04); filter: brightness(1.05); }
 
   /* Admin & Lightbox Overlays */
   .modal-overlay {
@@ -241,6 +242,17 @@
           </a>
         </div>
       </div>
+
+      <div class="md:col-span-6 md:col-start-7 space-y-4">
+        <div id="contactFormMsg" class="hidden text-xs uppercase tracking-widest text-brand-gold"></div>
+        <form id="contactForm" class="space-y-3" novalidate>
+          <input type="text" id="cfName" required class="admin-input" placeholder="Your name" />
+          <input type="email" id="cfEmail" required class="admin-input" placeholder="Your email" />
+          <textarea id="cfMessage" required rows="3" class="admin-input font-sans" placeholder="Your message"></textarea>
+          <button type="submit" class="admin-btn text-xs uppercase tracking-widest">Send Message</button>
+          <p class="text-[10px] text-brand-muted">Opens your email app with this pre-filled, addressed to the contact email above.</p>
+        </form>
+      </div>
     </div>
     <div class="flex flex-col md:flex-row justify-between items-center py-8 text-[10px] uppercase tracking-widest text-brand-muted gap-4">
       <span id="txt-footerCopyright">© 2026 Portfolio</span>
@@ -252,6 +264,13 @@
 <!-- Fullscreen Lightbox Modal -->
 <div id="lightboxModal" class="modal-overlay flex-col p-4 md:p-8">
   <button id="lightboxClose" class="absolute top-6 right-6 text-brand-muted hover:text-brand-light text-3xl z-10 w-12 h-12 flex items-center justify-center bg-black/50 rounded-full border border-brand-border transition-colors">×</button>
+  <span id="lightboxCounter" class="absolute top-8 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.2em] text-brand-muted z-10"></span>
+  <button id="lightboxPrev" class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-light z-10 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-black/50 rounded-full border border-brand-border transition-colors" aria-label="Previous photo">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button id="lightboxNext" class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-light z-10 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-black/50 rounded-full border border-brand-border transition-colors" aria-label="Next photo">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
   <div class="relative max-w-5xl max-h-[82vh] w-full h-full flex flex-col items-center justify-center">
     <img id="lightboxImg" class="max-h-[75vh] max-w-full object-contain rounded-lg shadow-2xl" src="" alt="Lightbox view" />
     <p id="lightboxCaption" class="mt-4 text-xs uppercase tracking-[0.2em] text-brand-muted text-center"></p>
@@ -420,7 +439,7 @@
 
       renderCategoryNav();
       if (data.categories && data.categories.length) {
-        renderGallery(data.categories[0].name);
+        renderGallery(data.categories.length > 1 ? ALL_CATEGORY : data.categories[0].name);
       }
       renderTestimonials();
     } catch (err) {
@@ -451,15 +470,21 @@
       card.style.animationDelay = (index * 0.08) + 's';
 
       const igLink = t.instagram
-        ? `<a href="${escapeHtml(t.instagram)}" target="_blank" rel="noopener noreferrer" class="mt-4 w-9 h-9 rounded-full border border-brand-border inline-flex items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors">
+        ? `<a href="${escapeHtml(t.instagram)}" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full border border-brand-border inline-flex items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors">
              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
            </a>`
         : '';
 
+      const initials = (t.name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+      const avatarHtml = t.avatar
+        ? `<img src="${escapeHtml(t.avatar)}" alt="${escapeHtml(t.name || '')}" class="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0" />`
+        : `<div class="w-10 h-10 rounded-full border border-brand-border bg-brand-dark flex items-center justify-center text-xs text-brand-gold font-medium shrink-0">${escapeHtml(initials)}</div>`;
+
       card.innerHTML = `
         <p class="text-sm leading-relaxed text-brand-light/90">"${escapeHtml(t.quote || '')}"</p>
-        <div class="mt-4">
-          <p class="text-xs uppercase tracking-widest text-brand-muted">${escapeHtml(t.name || '')}</p>
+        <div class="mt-4 flex items-center gap-3">
+          ${avatarHtml}
+          <p class="text-xs uppercase tracking-widest text-brand-muted flex-1">${escapeHtml(t.name || '')}</p>
           ${igLink}
         </div>`;
       grid.appendChild(card);
@@ -512,19 +537,33 @@
     toggle('contactFacebook', c.facebook || '');
   }
 
+  const ALL_CATEGORY = '__ALL__';
+
   function renderCategoryNav() {
     const nav = document.getElementById('catNav');
     nav.innerHTML = '';
-    (siteData.categories || []).forEach((cat, i) => {
+    const cats = siteData.categories || [];
+    const totalPhotos = cats.reduce((sum, c) => sum + ((c.photos && c.photos.length) || 0), 0);
+
+    const makeBtn = (name, label, count, isActive) => {
       const btn = document.createElement('button');
-      btn.textContent = cat.name;
-      btn.className = 'cat-btn pb-1 text-xs uppercase tracking-[0.2em] font-medium border-b transition-all duration-300' + (i === '0' || i === 0 ? ' active' : '');
+      btn.className = 'cat-btn pb-1 text-xs uppercase tracking-[0.2em] font-medium border-b transition-all duration-300 flex items-center gap-1.5' + (isActive ? ' active' : '');
+      btn.innerHTML = `<span>${escapeHtml(label)}</span><span class="text-[10px] text-brand-muted">(${count})</span>`;
       btn.addEventListener('click', () => {
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderGallery(cat.name);
+        renderGallery(name);
       });
-      nav.appendChild(btn);
+      return btn;
+    };
+
+    if (cats.length > 1) {
+      nav.appendChild(makeBtn(ALL_CATEGORY, 'All', totalPhotos, true));
+    }
+    cats.forEach((cat, i) => {
+      const count = (cat.photos && cat.photos.length) || 0;
+      const isActive = cats.length <= 1 && i === 0;
+      nav.appendChild(makeBtn(cat.name, cat.name, count, isActive));
     });
   }
 
@@ -532,8 +571,10 @@
     const grid = document.getElementById('galleryGrid');
     const empty = document.getElementById('galleryEmpty');
     grid.innerHTML = '';
-    const cat = (siteData.categories || []).find(c => c.name === categoryName);
-    const photos = (cat && cat.photos) || [];
+    const cats = siteData.categories || [];
+    const photos = categoryName === ALL_CATEGORY
+      ? cats.flatMap(c => c.photos || [])
+      : ((cats.find(c => c.name === categoryName) || {}).photos || []);
 
     if (!photos.length) {
       empty.classList.remove('hidden');
@@ -549,14 +590,14 @@
       wrap.innerHTML = `
         <div class="aspect-portrait overflow-hidden rounded-xl bg-zinc-900 border border-brand-border/40 shadow-2xl relative">
           <div class="absolute inset-0 skeleton"></div>
-          <img class="gallery-img w-full h-full object-cover relative z-10" src="${photo.url}" alt="${photo.name || 'Portrait'}" loading="lazy" onload="this.previousElementSibling.style.display='none'" />
+          <img class="gallery-img w-full h-full object-cover relative z-10" src="${photo.url}" alt="${photo.name || 'Portrait'}" loading="lazy" onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 flex items-end p-6">
             <span class="text-xs uppercase tracking-[0.2em] text-brand-light font-medium">${photo.name || 'Untitled'}</span>
           </div>
         </div>`;
       
       // Open Lightbox on click
-      wrap.addEventListener('click', () => openLightbox(photo.url, photo.name, photo.instagram));
+      wrap.addEventListener('click', () => openLightbox(photos, index));
       grid.appendChild(wrap);
     });
   }
@@ -569,18 +610,39 @@
   const lightboxCaption = document.getElementById('lightboxCaption');
   const lightboxClose = document.getElementById('lightboxClose');
   const lightboxInstagram = document.getElementById('lightboxInstagram');
+  const lightboxPrev = document.getElementById('lightboxPrev');
+  const lightboxNext = document.getElementById('lightboxNext');
+  const lightboxCounter = document.getElementById('lightboxCounter');
 
-  function openLightbox(url, name, instagram) {
-    lightboxImg.src = url;
-    lightboxCaption.textContent = name || '';
-    if (instagram) {
-      lightboxInstagram.href = instagram;
+  let lightboxPhotos = [];
+  let lightboxIndex = 0;
+
+  function showLightboxPhoto(index) {
+    if (!lightboxPhotos.length) return;
+    lightboxIndex = (index + lightboxPhotos.length) % lightboxPhotos.length;
+    const photo = lightboxPhotos[lightboxIndex];
+
+    lightboxImg.src = photo.url;
+    lightboxCaption.textContent = photo.name || '';
+
+    if (photo.instagram) {
+      lightboxInstagram.href = photo.instagram;
       lightboxInstagram.classList.remove('hidden');
       lightboxInstagram.classList.add('flex');
     } else {
       lightboxInstagram.classList.add('hidden');
       lightboxInstagram.classList.remove('flex');
     }
+
+    const multi = lightboxPhotos.length > 1;
+    lightboxPrev.classList.toggle('hidden', !multi);
+    lightboxNext.classList.toggle('hidden', !multi);
+    lightboxCounter.textContent = multi ? (lightboxIndex + 1) + ' / ' + lightboxPhotos.length : '';
+  }
+
+  function openLightbox(photos, index) {
+    lightboxPhotos = photos || [];
+    showLightboxPhoto(index || 0);
     lightboxModal.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -590,9 +652,17 @@
     document.body.style.overflow = '';
   }
 
+  lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); showLightboxPhoto(lightboxIndex - 1); });
+  lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); showLightboxPhoto(lightboxIndex + 1); });
+
   lightboxClose.addEventListener('click', closeLightbox);
   lightboxModal.addEventListener('click', (e) => {
     if (e.target === lightboxModal) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxModal.classList.contains('open')) return;
+    if (e.key === 'ArrowLeft') showLightboxPhoto(lightboxIndex - 1);
+    if (e.key === 'ArrowRight') showLightboxPhoto(lightboxIndex + 1);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -639,6 +709,35 @@
   });
   document.getElementById('copyPhoneBtn').addEventListener('click', function () {
     copyToClipboard((siteData.contact && siteData.contact.phone) || '', this);
+  });
+
+  // Contact form (mailto — no backend required)
+  const contactForm = document.getElementById('contactForm');
+  const contactFormMsg = document.getElementById('contactFormMsg');
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('cfName').value.trim();
+    const fromEmail = document.getElementById('cfEmail').value.trim();
+    const message = document.getElementById('cfMessage').value.trim();
+    const toEmail = (siteData.contact && siteData.contact.email) || '';
+
+    if (!name || !fromEmail || !message) return;
+
+    if (!toEmail) {
+      contactFormMsg.textContent = 'Contact email not set up yet — please reach out via another method below.';
+      contactFormMsg.classList.remove('hidden');
+      return;
+    }
+
+    const subject = 'Website inquiry from ' + name;
+    const body = message + '\n\n— ' + name + ' (' + fromEmail + ')';
+    window.location.href = 'mailto:' + encodeURIComponent(toEmail) +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body);
+
+    contactFormMsg.textContent = 'Opening your email app…';
+    contactFormMsg.classList.remove('hidden');
+    contactForm.reset();
   });
 
   // Scroll to top button
@@ -849,7 +948,7 @@
 
   document.getElementById('addTestimonial').addEventListener('click', () => {
     const container = document.getElementById('editTestimonials');
-    container.appendChild(makeTestimonialBlock({ name: '', quote: '', instagram: '' }));
+    container.appendChild(makeTestimonialBlock({ name: '', quote: '', instagram: '', avatar: '' }));
   });
 
   function makeTestimonialBlock(t) {
@@ -862,6 +961,7 @@
       </div>
       <textarea class="admin-input testi-quote font-sans" rows="2" placeholder="Testimonial / comment">${escapeHtml(t.quote || '')}</textarea>
       <input type="url" class="admin-input testi-instagram" value="${escapeHtml(t.instagram || '')}" placeholder="Instagram link (post or profile/home page, optional)" />
+      <input type="url" class="admin-input testi-avatar" value="${escapeHtml(t.avatar || '')}" placeholder="Photo/avatar URL (optional)" />
     `;
     block.querySelector('.remove-testimonial').addEventListener('click', () => block.remove());
     return block;
@@ -888,8 +988,9 @@
       const name = block.querySelector('.testi-name').value.trim();
       const quote = block.querySelector('.testi-quote').value.trim();
       const instagram = block.querySelector('.testi-instagram').value.trim();
+      const avatar = block.querySelector('.testi-avatar').value.trim();
       if (!name && !quote) return;
-      newData.testimonials.push({ name, quote, instagram });
+      newData.testimonials.push({ name, quote, instagram, avatar });
     });
 
     document.querySelectorAll('#editStyles > div').forEach(row => {
@@ -940,7 +1041,7 @@
       renderContactLinks();
 
       renderCategoryNav();
-      if (siteData.categories.length) renderGallery(siteData.categories[0].name);
+      if (siteData.categories.length) renderGallery(siteData.categories.length > 1 ? ALL_CATEGORY : siteData.categories[0].name);
       renderTestimonials();
 
       saveMsg.textContent = 'Changes saved & published successfully!';
