@@ -191,9 +191,27 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 py-16 md:py-20 border-b border-brand-border">
       <div class="md:col-span-4 space-y-4">
         <span id="txt-contactLabel" class="text-[10px] uppercase tracking-[0.2em] text-brand-gold block">Contact</span>
-        <a id="contactEmail" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
-        <a id="contactPhone" href="#" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
-        <a id="contactInstagram" href="#" target="_blank" rel="noopener noreferrer" class="block text-sm hover:text-brand-gold transition-colors">Loading…</a>
+
+        <a id="contactEmail" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+          <span id="contactEmailText">Loading…</span>
+        </a>
+        <a id="contactPhone" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><path d="M4 3.5h4l2 5-2.5 1.5a12 12 0 006 6l1.5-2.5 5 2v4a2 2 0 01-2 2C10.5 21.5 2.5 13.5 2.5 5.5a2 2 0 011.5-2z"/></svg>
+          <span id="contactPhoneText">Loading…</span>
+        </a>
+
+        <div class="flex items-center gap-3 pt-2">
+          <a id="contactInstagram" href="#" target="_blank" rel="noopener noreferrer" class="hidden w-9 h-9 rounded-full border border-brand-border items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors" title="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a id="contactWhatsapp" href="#" target="_blank" rel="noopener noreferrer" class="hidden w-9 h-9 rounded-full border border-brand-border items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors" title="WhatsApp">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 12a8 8 0 10-14.6 4.6L4 21l4.5-1.4A8 8 0 0020 12z"/><path d="M8.7 8.7c-.2.6-.1 1.5.6 2.7.9 1.5 2.3 2.7 3.9 3.2.9.3 1.5.2 2-.2.4-.3.6-.7.6-1"/></svg>
+          </a>
+          <a id="contactFacebook" href="#" target="_blank" rel="noopener noreferrer" class="hidden w-9 h-9 rounded-full border border-brand-border items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors" title="Facebook">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 8.5h-2c-.8 0-1.5.7-1.5 1.5v2h3.3l-.5 3H11.5v7.5H9V15H7v-3h2v-2.3C9 7.4 10.6 5.8 13 5.8h2v2.7z"/></svg>
+          </a>
+        </div>
       </div>
     </div>
     <div class="flex flex-col md:flex-row justify-between items-center py-8 text-[10px] uppercase tracking-widest text-brand-muted gap-4">
@@ -258,6 +276,9 @@
         <input id="editEmail" type="email" class="admin-input" placeholder="Email address" />
         <input id="editPhone" type="text" class="admin-input" placeholder="Phone number" />
         <input id="editInstagram" type="url" class="admin-input" placeholder="Instagram URL" />
+        <input id="editWhatsapp" type="text" class="admin-input" placeholder="WhatsApp number (e.g. 919876543210) or full wa.me link" />
+        <input id="editFacebook" type="url" class="admin-input" placeholder="Facebook page URL" />
+        <p class="text-[10px] text-brand-muted">Leave any field blank to hide that icon on the site. Any contact method left empty simply won't show.</p>
       </div>
 
       <!-- Testimonials -->
@@ -314,7 +335,7 @@
 
   let siteData = {
     hero: '',
-    contact: { email: '', phone: '', instagram: '' },
+    contact: { email: '', phone: '', instagram: '', whatsapp: '', facebook: '' },
     categories: [],
     testimonials: [],
     styles: {}
@@ -353,22 +374,12 @@
       siteData = data;
       if (!siteData.styles) siteData.styles = {};
       if (!siteData.testimonials) siteData.testimonials = [];
+      if (!siteData.contact) siteData.contact = { email: '', phone: '', instagram: '', whatsapp: '', facebook: '' };
       applyStyles();
 
       if (data.hero) document.getElementById('heroImg').src = data.hero;
 
-      const emailEl = document.getElementById('contactEmail');
-      const phoneEl = document.getElementById('contactPhone');
-      const instaEl = document.getElementById('contactInstagram');
-      if (data.contact) {
-        emailEl.textContent = data.contact.email || '';
-        emailEl.href = data.contact.email ? 'mailto:' + data.contact.email : '#';
-        phoneEl.textContent = data.contact.phone || '';
-        phoneEl.href = data.contact.phone ? 'tel:' + data.contact.phone : '#';
-        instaEl.textContent = data.contact.instagram ? 'Instagram' : '';
-        instaEl.href = data.contact.instagram || '#';
-        instaEl.style.display = data.contact.instagram ? '' : 'none';
-      }
+      renderContactLinks();
 
       renderCategoryNav();
       if (data.categories && data.categories.length) {
@@ -413,6 +424,50 @@
         </div>`;
       grid.appendChild(card);
     });
+  }
+
+  function toDigitsOnly(str) {
+    return (str || '').replace(/[^\d]/g, '');
+  }
+
+  function toWhatsappUrl(raw) {
+    if (!raw) return '';
+    const trimmed = raw.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    const digits = toDigitsOnly(trimmed);
+    return digits ? 'https://wa.me/' + digits : '';
+  }
+
+  function renderContactLinks() {
+    const c = siteData.contact || {};
+
+    const emailEl = document.getElementById('contactEmail');
+    const emailText = document.getElementById('contactEmailText');
+    emailText.textContent = c.email || '';
+    emailEl.href = c.email ? 'mailto:' + c.email : '#';
+    emailEl.style.display = c.email ? '' : 'none';
+
+    const phoneEl = document.getElementById('contactPhone');
+    const phoneText = document.getElementById('contactPhoneText');
+    phoneText.textContent = c.phone || '';
+    phoneEl.href = c.phone ? 'tel:' + c.phone : '#';
+    phoneEl.style.display = c.phone ? '' : 'none';
+
+    const toggle = (id, href) => {
+      const el = document.getElementById(id);
+      if (href) {
+        el.href = href;
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      } else {
+        el.classList.add('hidden');
+        el.classList.remove('flex');
+      }
+    };
+
+    toggle('contactInstagram', c.instagram || '');
+    toggle('contactWhatsapp', toWhatsappUrl(c.whatsapp || ''));
+    toggle('contactFacebook', c.facebook || '');
   }
 
   function renderCategoryNav() {
@@ -593,6 +648,8 @@
     document.getElementById('editEmail').value = (siteData.contact && siteData.contact.email) || '';
     document.getElementById('editPhone').value = (siteData.contact && siteData.contact.phone) || '';
     document.getElementById('editInstagram').value = (siteData.contact && siteData.contact.instagram) || '';
+    document.getElementById('editWhatsapp').value = (siteData.contact && siteData.contact.whatsapp) || '';
+    document.getElementById('editFacebook').value = (siteData.contact && siteData.contact.facebook) || '';
 
     const testiContainer = document.getElementById('editTestimonials');
     testiContainer.innerHTML = '';
@@ -715,7 +772,9 @@
       contact: {
         email: document.getElementById('editEmail').value.trim(),
         phone: document.getElementById('editPhone').value.trim(),
-        instagram: document.getElementById('editInstagram').value.trim()
+        instagram: document.getElementById('editInstagram').value.trim(),
+        whatsapp: document.getElementById('editWhatsapp').value.trim(),
+        facebook: document.getElementById('editFacebook').value.trim()
       },
       categories: [],
       testimonials: [],
@@ -775,16 +834,7 @@
       applyStyles();
       if (siteData.hero) document.getElementById('heroImg').src = siteData.hero;
 
-      const emailEl = document.getElementById('contactEmail');
-      const phoneEl = document.getElementById('contactPhone');
-      const instaEl = document.getElementById('contactInstagram');
-      emailEl.textContent = siteData.contact.email || '';
-      emailEl.href = siteData.contact.email ? 'mailto:' + siteData.contact.email : '#';
-      phoneEl.textContent = siteData.contact.phone || '';
-      phoneEl.href = siteData.contact.phone ? 'tel:' + siteData.contact.phone : '#';
-      instaEl.textContent = siteData.contact.instagram ? 'Instagram' : '';
-      instaEl.href = siteData.contact.instagram || '#';
-      instaEl.style.display = siteData.contact.instagram ? '' : 'none';
+      renderContactLinks();
 
       renderCategoryNav();
       if (siteData.categories.length) renderGallery(siteData.categories[0].name);
