@@ -96,7 +96,7 @@
 <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[90%] max-w-7xl">
   <div class="flex items-center justify-between px-6 py-3.5 bg-brand-dark/85 backdrop-blur-md border border-brand-border rounded-full shadow-xl shadow-black/40">
     <div class="flex items-center gap-3">
-      <a href="#" class="text-xs uppercase tracking-[0.25em] font-bold text-brand-gold">KAAD PORTRAITS</a>
+      <a href="#" id="txt-navTitle" class="text-xs uppercase tracking-[0.25em] font-bold text-brand-gold">KAAD PORTRAITS</a>
     </div>
     <div class="hidden md:flex items-center gap-8">
       <a href="#" class="nav-link-underline text-xs uppercase tracking-widest font-medium text-brand-light">Home</a>
@@ -323,6 +323,7 @@
   const WORKER_URL = 'https://kaad-portraits.sk6594246.workers.dev';
 
   const STYLE_KEYS = {
+    navTitle:          { label: 'Site Title (Nav Bar)',           defaultFontSize: '0.75rem', defaultAlign: 'left',  defaultContent: 'KAAD PORTRAITS' },
     heroTitle:        { label: 'Hero Title (PORTFOLIO)',         defaultFontSize: '0.75rem', defaultAlign: 'left',  defaultContent: 'PORTFOLIO' },
     heroSubtitle:      { label: 'Hero Subtitle (VISUAL WORK)',    defaultFontSize: '0.75rem', defaultAlign: 'right', defaultContent: 'VISUAL WORK' },
     galleryHeading:    { label: 'Gallery Heading (CURATED WORK)', defaultFontSize: '0.75rem', defaultAlign: 'left',  defaultContent: 'CURATED WORK' },
