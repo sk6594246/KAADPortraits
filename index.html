@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KAAD Portraits — Curated Visual Work</title>
+<meta name="description" content="KAAD Portraits — a curated collection of editorial, landscape, and portrait photography." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230a0a0a'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%23D4AF37' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="KAAD Portraits" />
+<meta property="og:description" content="A curated collection of editorial, landscape, and portrait photography." />
+<meta property="og:image" content="" id="ogImageMeta" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="description" content="KAAD Portraits — curated editorial, landscape, and portrait photography.">
+<meta property="og:title" content="KAAD Portraits — Curated Visual Work">
+<meta property="og:description" content="Curated editorial, landscape, and portrait photography.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%230a0a0a'/%3E%3Ccircle cx='12' cy='12' r='7.5' fill='none' stroke='%23D4AF37' stroke-width='1.6'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23D4AF37'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,11 +111,11 @@
     <div class="flex items-center gap-3">
       <a href="#" id="txt-navTitle" class="text-xs uppercase tracking-[0.25em] font-bold text-brand-gold">KAAD PORTRAITS</a>
     </div>
-    <div class="hidden md:flex items-center gap-8">
-      <a href="#" class="nav-link-underline text-xs uppercase tracking-widest font-medium text-brand-light">Home</a>
-      <a href="#gallery" class="nav-link-underline text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">Gallery</a>
-      <a href="#about" class="nav-link-underline text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">About</a>
-      <a href="#contact" class="nav-link-underline text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">Contact</a>
+    <div class="hidden md:flex items-center gap-8" id="desktopNavLinks">
+      <a href="#home" data-section="home" class="nav-link-underline scroll-nav-link text-xs uppercase tracking-widest font-medium text-brand-light">Home</a>
+      <a href="#gallery" data-section="gallery" class="nav-link-underline scroll-nav-link text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">Gallery</a>
+      <a href="#about" data-section="about" class="nav-link-underline scroll-nav-link text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">About</a>
+      <a href="#contact" data-section="contact" class="nav-link-underline scroll-nav-link text-xs uppercase tracking-widest font-medium text-brand-muted hover:text-brand-light">Contact</a>
     </div>
     <div class="flex items-center gap-4">
       <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-brand-surface border border-brand-border">
@@ -123,7 +136,7 @@
 <div id="mobileMenu" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col justify-center px-8 transition-all duration-300 opacity-0 pointer-events-none">
   <button id="mobileMenuClose" class="absolute top-8 right-8 text-brand-muted hover:text-brand-light text-3xl focus:outline-none">×</button>
   <div class="flex flex-col gap-8 text-center">
-    <a href="#" class="mobile-nav-link text-2xl font-serif tracking-wide text-brand-light hover:text-brand-gold transition-colors">Home</a>
+    <a href="#home" class="mobile-nav-link text-2xl font-serif tracking-wide text-brand-light hover:text-brand-gold transition-colors">Home</a>
     <a href="#gallery" class="mobile-nav-link text-2xl font-serif tracking-wide text-brand-light hover:text-brand-gold transition-colors">Gallery</a>
     <a href="#about" class="mobile-nav-link text-2xl font-serif tracking-wide text-brand-light hover:text-brand-gold transition-colors">About</a>
     <a href="#contact" class="mobile-nav-link text-2xl font-serif tracking-wide text-brand-light hover:text-brand-gold transition-colors">Contact</a>
@@ -131,7 +144,7 @@
 </div>
 
 <!-- Hero -->
-<header class="relative h-[85vh] md:h-[92vh] flex flex-col justify-end px-wrap pb-16 overflow-hidden">
+<header id="home" class="relative h-[85vh] md:h-[92vh] flex flex-col justify-end px-wrap pb-16 overflow-hidden">
   <div class="absolute inset-0 z-0">
     <img id="heroImg" class="w-full h-full object-cover bg-zinc-900 opacity-90 transition-opacity duration-1000" src="" alt="Hero photo" />
     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/30 to-black/40"></div>
@@ -146,7 +159,7 @@
 
 <main id="gallery">
   <!-- Gallery -->
-  <section class="py-24 md:py-36 px-wrap">
+  <section id="gallerySection" class="py-24 md:py-36 px-wrap">
     <div class="max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-8 border-b border-brand-border pb-8">
         <h2 id="txt-galleryHeading" class="text-xs uppercase tracking-[0.25em] font-medium text-brand-gold">CURATED WORK</h2>
@@ -179,6 +192,11 @@
     <div class="max-w-7xl mx-auto">
       <h2 class="text-xs uppercase tracking-[0.25em] font-medium text-brand-gold mb-12 md:mb-16">What People Say</h2>
       <div id="testimonialsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+      <div id="testimonialsSkeleton" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="border border-brand-border rounded-xl p-6 h-40 skeleton"></div>
+        <div class="border border-brand-border rounded-xl p-6 h-40 skeleton"></div>
+        <div class="border border-brand-border rounded-xl p-6 h-40 skeleton"></div>
+      </div>
       <p id="testimonialsEmpty" class="hidden text-sm text-brand-muted py-4">No testimonials yet.</p>
     </div>
   </section>
@@ -192,14 +210,24 @@
       <div class="md:col-span-4 space-y-4">
         <span id="txt-contactLabel" class="text-[10px] uppercase tracking-[0.2em] text-brand-gold block">Contact</span>
 
-        <a id="contactEmail" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
-          <span id="contactEmailText">Loading…</span>
-        </a>
-        <a id="contactPhone" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><path d="M4 3.5h4l2 5-2.5 1.5a12 12 0 006 6l1.5-2.5 5 2v4a2 2 0 01-2 2C10.5 21.5 2.5 13.5 2.5 5.5a2 2 0 011.5-2z"/></svg>
-          <span id="contactPhoneText">Loading…</span>
-        </a>
+        <div class="flex items-center gap-2 group/copy">
+          <a id="contactEmail" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+            <span id="contactEmailText">Loading…</span>
+          </a>
+          <button id="copyEmailBtn" type="button" class="hidden text-brand-muted hover:text-brand-gold transition-colors p-1" title="Copy email" aria-label="Copy email">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>
+          </button>
+        </div>
+        <div class="flex items-center gap-2 group/copy">
+          <a id="contactPhone" href="#" class="flex items-center gap-2.5 text-sm hover:text-brand-gold transition-colors">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" class="shrink-0"><path d="M4 3.5h4l2 5-2.5 1.5a12 12 0 006 6l1.5-2.5 5 2v4a2 2 0 01-2 2C10.5 21.5 2.5 13.5 2.5 5.5a2 2 0 011.5-2z"/></svg>
+            <span id="contactPhoneText">Loading…</span>
+          </a>
+          <button id="copyPhoneBtn" type="button" class="hidden text-brand-muted hover:text-brand-gold transition-colors p-1" title="Copy phone number" aria-label="Copy phone number">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg>
+          </button>
+        </div>
 
         <div class="flex items-center gap-3 pt-2">
           <a id="contactInstagram" href="#" target="_blank" rel="noopener noreferrer" class="hidden w-9 h-9 rounded-full border border-brand-border items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors" title="Instagram">
@@ -232,6 +260,14 @@
     </a>
   </div>
 </div>
+
+<!-- Scroll to top -->
+<button id="scrollTopBtn" title="Back to top" aria-label="Back to top"
+  class="fixed bottom-6 left-6 z-40 w-11 h-11 rounded-full bg-brand-dark/90 border border-brand-border
+         text-brand-muted hover:text-brand-gold hover:border-brand-gold transition-all duration-300
+         flex items-center justify-center shadow-2xl backdrop-blur-md opacity-0 pointer-events-none translate-y-2">
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
 
 <!-- Tiny Admin button (bottom-right) -->
 <button id="adminBtn" title="Admin Panel"
@@ -378,7 +414,7 @@
       if (!siteData.contact) siteData.contact = { email: '', phone: '', instagram: '', whatsapp: '', facebook: '' };
       applyStyles();
 
-      if (data.hero) document.getElementById('heroImg').src = data.hero;
+      if (data.hero) { document.getElementById('heroImg').src = data.hero; document.getElementById('ogImageMeta').setAttribute('content', data.hero); }
 
       renderContactLinks();
 
@@ -391,12 +427,15 @@
       console.error('Failed to load site data:', err);
       document.getElementById('galleryEmpty').classList.remove('hidden');
       document.getElementById('galleryEmpty').textContent = 'Could not load content. Check the Worker URL or network connection.';
+      document.getElementById('testimonialsSkeleton').classList.add('hidden');
     }
   }
 
   function renderTestimonials() {
     const grid = document.getElementById('testimonialsGrid');
     const empty = document.getElementById('testimonialsEmpty');
+    const skeleton = document.getElementById('testimonialsSkeleton');
+    skeleton.classList.add('hidden');
     grid.innerHTML = '';
     const items = siteData.testimonials || [];
 
@@ -447,12 +486,14 @@
     emailText.textContent = c.email || '';
     emailEl.href = c.email ? 'mailto:' + c.email : '#';
     emailEl.style.display = c.email ? '' : 'none';
+    document.getElementById('copyEmailBtn').classList.toggle('hidden', !c.email);
 
     const phoneEl = document.getElementById('contactPhone');
     const phoneText = document.getElementById('contactPhoneText');
     phoneText.textContent = c.phone || '';
     phoneEl.href = c.phone ? 'tel:' + c.phone : '#';
     phoneEl.style.display = c.phone ? '' : 'none';
+    document.getElementById('copyPhoneBtn').classList.toggle('hidden', !c.phone);
 
     const toggle = (id, href) => {
       const el = document.getElementById(id);
@@ -579,6 +620,67 @@
   }
 
   mobileMenuBtn.addEventListener('click', openMobileMenu);
+
+  function copyToClipboard(text, btn) {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+      btn.classList.add('text-brand-gold');
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('text-brand-gold');
+      }, 1500);
+    }).catch(() => {});
+  }
+
+  document.getElementById('copyEmailBtn').addEventListener('click', function () {
+    copyToClipboard((siteData.contact && siteData.contact.email) || '', this);
+  });
+  document.getElementById('copyPhoneBtn').addEventListener('click', function () {
+    copyToClipboard((siteData.contact && siteData.contact.phone) || '', this);
+  });
+
+  // Scroll to top button
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 500) {
+      scrollTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+    } else {
+      scrollTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+    }
+  }, { passive: true });
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Active nav-link highlighting on scroll
+  const scrollSections = ['home', 'gallerySection', 'about', 'contact']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+  const sectionToNavKey = { home: 'home', gallerySection: 'gallery', about: 'about', contact: 'contact' };
+  const navLinks = document.querySelectorAll('.scroll-nav-link');
+
+  function setActiveNav(key) {
+    navLinks.forEach(link => {
+      const isActive = link.dataset.section === key;
+      link.classList.toggle('text-brand-light', isActive);
+      link.classList.toggle('text-brand-muted', !isActive);
+    });
+  }
+
+  if (scrollSections.length && 'IntersectionObserver' in window) {
+    const spyObserver = new IntersectionObserver((entries) => {
+      let best = null;
+      entries.forEach(entry => {
+        if (entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)) {
+          best = entry;
+        }
+      });
+      if (best) setActiveNav(sectionToNavKey[best.target.id]);
+    }, { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] });
+    scrollSections.forEach(sec => spyObserver.observe(sec));
+  }
   mobileMenuClose.addEventListener('click', closeMobileMenu);
   document.querySelectorAll('.mobile-nav-link').forEach(link => {
     link.addEventListener('click', closeMobileMenu);
@@ -833,7 +935,7 @@
 
       siteData = newData;
       applyStyles();
-      if (siteData.hero) document.getElementById('heroImg').src = siteData.hero;
+      if (siteData.hero) { document.getElementById('heroImg').src = siteData.hero; document.getElementById('ogImageMeta').setAttribute('content', siteData.hero); }
 
       renderContactLinks();
 
