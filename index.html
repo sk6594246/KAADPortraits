@@ -173,6 +173,15 @@
       </div>
     </div>
   </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials" class="py-24 md:py-36 px-wrap border-t border-brand-border">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-xs uppercase tracking-[0.25em] font-medium text-brand-gold mb-12 md:mb-16">What People Say</h2>
+      <div id="testimonialsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+      <p id="testimonialsEmpty" class="hidden text-sm text-brand-muted py-4">No testimonials yet.</p>
+    </div>
+  </section>
 </main>
 
 <!-- Footer / Contact -->
@@ -200,6 +209,9 @@
   <div class="relative max-w-5xl max-h-[82vh] w-full h-full flex flex-col items-center justify-center">
     <img id="lightboxImg" class="max-h-[75vh] max-w-full object-contain rounded-lg shadow-2xl" src="" alt="Lightbox view" />
     <p id="lightboxCaption" class="mt-4 text-xs uppercase tracking-[0.2em] text-brand-muted text-center"></p>
+    <a id="lightboxInstagram" href="#" target="_blank" rel="noopener noreferrer" class="hidden mt-3 w-9 h-9 rounded-full border border-brand-border items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+    </a>
   </div>
 </div>
 
@@ -248,6 +260,16 @@
         <input id="editInstagram" type="url" class="admin-input" placeholder="Instagram URL" />
       </div>
 
+      <!-- Testimonials -->
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between">
+          <p class="text-[10px] uppercase tracking-widest text-brand-gold">Testimonials</p>
+          <button id="addTestimonial" class="admin-btn-secondary text-xs">+ Add Testimonial</button>
+        </div>
+        <p class="text-[10px] text-brand-muted">Not tied to a specific photo. Instagram link can point to a post or your profile/home page.</p>
+        <div id="editTestimonials" class="space-y-4 max-h-64 overflow-y-auto pr-2"></div>
+      </div>
+
       <!-- Categories / Albums -->
       <div class="space-y-3 pt-2">
         <div class="flex items-center justify-between">
@@ -294,6 +316,7 @@
     hero: '',
     contact: { email: '', phone: '', instagram: '' },
     categories: [],
+    testimonials: [],
     styles: {}
   };
 
@@ -329,6 +352,7 @@
 
       siteData = data;
       if (!siteData.styles) siteData.styles = {};
+      if (!siteData.testimonials) siteData.testimonials = [];
       applyStyles();
 
       if (data.hero) document.getElementById('heroImg').src = data.hero;
@@ -350,11 +374,45 @@
       if (data.categories && data.categories.length) {
         renderGallery(data.categories[0].name);
       }
+      renderTestimonials();
     } catch (err) {
       console.error('Failed to load site data:', err);
       document.getElementById('galleryEmpty').classList.remove('hidden');
       document.getElementById('galleryEmpty').textContent = 'Could not load content. Check the Worker URL or network connection.';
     }
+  }
+
+  function renderTestimonials() {
+    const grid = document.getElementById('testimonialsGrid');
+    const empty = document.getElementById('testimonialsEmpty');
+    grid.innerHTML = '';
+    const items = siteData.testimonials || [];
+
+    if (!items.length) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    items.forEach((t, index) => {
+      const card = document.createElement('div');
+      card.className = 'border border-brand-border rounded-xl p-6 bg-brand-surface/40 opacity-0 animate-fade-in flex flex-col justify-between';
+      card.style.animationDelay = (index * 0.08) + 's';
+
+      const igLink = t.instagram
+        ? `<a href="${escapeHtml(t.instagram)}" target="_blank" rel="noopener noreferrer" class="mt-4 w-9 h-9 rounded-full border border-brand-border inline-flex items-center justify-center text-brand-gold hover:border-brand-gold hover:bg-brand-gold/10 transition-colors">
+             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+           </a>`
+        : '';
+
+      card.innerHTML = `
+        <p class="text-sm leading-relaxed text-brand-light/90">"${escapeHtml(t.quote || '')}"</p>
+        <div class="mt-4">
+          <p class="text-xs uppercase tracking-widest text-brand-muted">${escapeHtml(t.name || '')}</p>
+          ${igLink}
+        </div>`;
+      grid.appendChild(card);
+    });
   }
 
   function renderCategoryNav() {
@@ -401,7 +459,7 @@
         </div>`;
       
       // Open Lightbox on click
-      wrap.addEventListener('click', () => openLightbox(photo.url, photo.name));
+      wrap.addEventListener('click', () => openLightbox(photo.url, photo.name, photo.instagram));
       grid.appendChild(wrap);
     });
   }
@@ -413,10 +471,19 @@
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxCaption = document.getElementById('lightboxCaption');
   const lightboxClose = document.getElementById('lightboxClose');
+  const lightboxInstagram = document.getElementById('lightboxInstagram');
 
-  function openLightbox(url, name) {
+  function openLightbox(url, name, instagram) {
     lightboxImg.src = url;
     lightboxCaption.textContent = name || '';
+    if (instagram) {
+      lightboxInstagram.href = instagram;
+      lightboxInstagram.classList.remove('hidden');
+      lightboxInstagram.classList.add('flex');
+    } else {
+      lightboxInstagram.classList.add('hidden');
+      lightboxInstagram.classList.remove('flex');
+    }
     lightboxModal.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -527,6 +594,12 @@
     document.getElementById('editPhone').value = (siteData.contact && siteData.contact.phone) || '';
     document.getElementById('editInstagram').value = (siteData.contact && siteData.contact.instagram) || '';
 
+    const testiContainer = document.getElementById('editTestimonials');
+    testiContainer.innerHTML = '';
+    (siteData.testimonials || []).forEach(t => {
+      testiContainer.appendChild(makeTestimonialBlock(t));
+    });
+
     const container = document.getElementById('editCategories');
     container.innerHTML = '';
     (siteData.categories || []).forEach((cat, catIndex) => {
@@ -588,7 +661,7 @@
 
     block.querySelector('.remove-cat').addEventListener('click', () => block.remove());
     block.querySelector('.add-photo').addEventListener('click', () => {
-      photosDiv.appendChild(makePhotoRow({ url: '', name: '' }));
+      photosDiv.appendChild(makePhotoRow({ url: '', name: '', instagram: '' }));
     });
 
     return block;
@@ -596,11 +669,14 @@
 
   function makePhotoRow(photo) {
     const row = document.createElement('div');
-    row.className = 'flex gap-2 items-center';
+    row.className = 'border border-brand-border/60 rounded-lg p-2 space-y-1.5';
     row.innerHTML = `
-      <input type="url" class="admin-input photo-url flex-1" value="${escapeHtml(photo.url || '')}" placeholder="Photo URL" />
-      <input type="text" class="admin-input photo-name" style="max-width:130px" value="${escapeHtml(photo.name || '')}" placeholder="Photo caption" />
-      <button type="button" class="admin-btn-secondary text-xs px-2.5 py-2 remove-photo">×</button>
+      <div class="flex gap-2 items-center">
+        <input type="url" class="admin-input photo-url flex-1" value="${escapeHtml(photo.url || '')}" placeholder="Photo Source URL" />
+        <input type="text" class="admin-input photo-name" style="max-width:130px" value="${escapeHtml(photo.name || '')}" placeholder="Photo caption" />
+        <button type="button" class="admin-btn-secondary text-xs px-2.5 py-2 remove-photo">×</button>
+      </div>
+      <input type="url" class="admin-input photo-instagram" value="${escapeHtml(photo.instagram || '')}" placeholder="Original Instagram post URL (optional)" />
     `;
     row.querySelector('.remove-photo').addEventListener('click', () => row.remove());
     return row;
@@ -610,6 +686,26 @@
     const container = document.getElementById('editCategories');
     container.appendChild(makeCategoryBlock({ name: 'New Album', photos: [] }, container.children.length));
   });
+
+  document.getElementById('addTestimonial').addEventListener('click', () => {
+    const container = document.getElementById('editTestimonials');
+    container.appendChild(makeTestimonialBlock({ name: '', quote: '', instagram: '' }));
+  });
+
+  function makeTestimonialBlock(t) {
+    const block = document.createElement('div');
+    block.className = 'border border-brand-border rounded-lg p-3 space-y-2 bg-brand-dark/50';
+    block.innerHTML = `
+      <div class="flex gap-2 items-center">
+        <input type="text" class="admin-input testi-name flex-1" value="${escapeHtml(t.name || '')}" placeholder="Name" />
+        <button type="button" class="admin-btn-secondary text-xs px-3 remove-testimonial">Remove</button>
+      </div>
+      <textarea class="admin-input testi-quote font-sans" rows="2" placeholder="Testimonial / comment">${escapeHtml(t.quote || '')}</textarea>
+      <input type="url" class="admin-input testi-instagram" value="${escapeHtml(t.instagram || '')}" placeholder="Instagram link (post or profile/home page, optional)" />
+    `;
+    block.querySelector('.remove-testimonial').addEventListener('click', () => block.remove());
+    return block;
+  }
 
   document.getElementById('saveBtn').addEventListener('click', async () => {
     const pin = pinInput.value.trim();
@@ -622,8 +718,17 @@
         instagram: document.getElementById('editInstagram').value.trim()
       },
       categories: [],
+      testimonials: [],
       styles: {}
     };
+
+    document.querySelectorAll('#editTestimonials > div').forEach(block => {
+      const name = block.querySelector('.testi-name').value.trim();
+      const quote = block.querySelector('.testi-quote').value.trim();
+      const instagram = block.querySelector('.testi-instagram').value.trim();
+      if (!name && !quote) return;
+      newData.testimonials.push({ name, quote, instagram });
+    });
 
     document.querySelectorAll('#editStyles > div').forEach(row => {
       const key = row.dataset.styleKey;
@@ -644,7 +749,8 @@
       block.querySelectorAll('.photos > div').forEach(row => {
         const url = row.querySelector('.photo-url').value.trim();
         const pname = row.querySelector('.photo-name').value.trim();
-        if (url) photos.push({ url, name: pname });
+        const pinsta = row.querySelector('.photo-instagram').value.trim();
+        if (url) photos.push({ url, name: pname, instagram: pinsta });
       });
       newData.categories.push({ name, photos });
     });
@@ -682,6 +788,7 @@
 
       renderCategoryNav();
       if (siteData.categories.length) renderGallery(siteData.categories[0].name);
+      renderTestimonials();
 
       saveMsg.textContent = 'Changes saved & published successfully!';
       saveMsg.style.color = '#4ade80';
