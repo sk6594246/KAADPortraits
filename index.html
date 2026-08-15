@@ -6,6 +6,13 @@
 <title>KAAD Portraits — Curated Visual Work</title>
 <meta name="description" content="KAAD Portraits — a curated collection of editorial, landscape, and portrait photography." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230a0a0a'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' fill='%23D4AF37' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0a0a0a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="KAAD" />
+<link rel="apple-touch-icon" href="icons/icon-192.svg" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="KAAD Portraits" />
 <meta property="og:description" content="A curated collection of editorial, landscape, and portrait photography." />
@@ -60,6 +67,19 @@
     --brand-muted: 138 138 138;
     --brand-border: 42 42 42;
     --brand-surface: 18 18 18;
+    /* Fluid design tokens */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --duration-fast: 0.25s;
+    --duration-med: 0.55s;
+    --duration-slow: 0.9s;
+    --space-page: clamp(1.15rem, 4vw, 2rem);
+    --space-section-y: clamp(4rem, 12vw, 9rem);
+    --space-section-y-sm: clamp(3rem, 8vw, 6rem);
+    --text-fluid-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.75rem);
+    --text-fluid-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.95rem);
+    --text-fluid-base: clamp(0.9rem, 0.85rem + 0.35vw, 1.05rem);
+    --gap-gallery: clamp(1rem, 2.5vw, 2rem);
   }
   html.theme-light {
     --brand-gold: 154 116 26;
@@ -69,21 +89,101 @@
     --brand-border: 224 219 209;
     --brand-surface: 242 240 235;
   }
-  body { font-family: 'Inter', sans-serif; background-color: rgb(var(--brand-dark)); color: rgb(var(--brand-light)); transition: background-color 0.3s ease, color 0.3s ease; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: rgb(var(--brand-dark));
+    color: rgb(var(--brand-light));
+    transition: background-color 0.45s var(--ease-out-soft), color 0.45s var(--ease-out-soft);
+    font-size: var(--text-fluid-base);
+    line-height: 1.6;
+  }
   .font-serif { font-family: 'Bodoni Moderna', serif; }
+
+  /* Fluid page gutters (overrides Tailwind px-wrap utility) */
+  .px-wrap {
+    padding-left: var(--space-page) !important;
+    padding-right: var(--space-page) !important;
+  }
+  .fluid-section {
+    padding-top: var(--space-section-y) !important;
+    padding-bottom: var(--space-section-y) !important;
+  }
+  .fluid-section-sm {
+    padding-top: var(--space-section-y-sm) !important;
+    padding-bottom: var(--space-section-y-sm) !important;
+  }
+
   .nav-link-underline { position: relative; }
   .nav-link-underline::after {
     content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 1px;
     background-color: currentColor; transform: scaleX(0); transform-origin: right;
-    transition: transform 0.6s cubic-bezier(0.43,0.145,0.285,1);
+    transition: transform 0.6s var(--ease-out-expo);
   }
   .nav-link-underline:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  .cat-btn {
+    transition: color var(--duration-med) var(--ease-out-soft),
+                border-color var(--duration-med) var(--ease-out-soft),
+                opacity var(--duration-fast) ease,
+                transform var(--duration-fast) var(--ease-out-soft);
+  }
+  .cat-btn:hover { transform: translateY(-1px); }
   .cat-btn.active { color: rgb(var(--brand-light)); border-color: rgb(var(--brand-gold)); }
   .cat-btn:not(.active) { color: rgb(var(--brand-muted)); border-color: transparent; }
+
   .aspect-portrait { aspect-ratio: 3/4; }
-  .gallery-img { transition: transform 1.2s cubic-bezier(.165,.84,.44,1), filter 0.5s ease, opacity 0.6s ease; opacity: 0; filter: blur(8px); }
+  .gallery-img {
+    transition: transform 1.2s var(--ease-out-expo), filter 0.55s var(--ease-out-soft), opacity 0.65s var(--ease-out-soft);
+    opacity: 0;
+    filter: blur(8px);
+  }
   .gallery-img.loaded { opacity: 1; filter: blur(0); }
-  .group:hover .gallery-img.loaded { transform: scale(1.04); filter: brightness(1.05); }
+  .group:hover .gallery-img.loaded { transform: scale(1.045); filter: brightness(1.05); }
+
+  /* Fluid gallery grid */
+  #galleryGrid {
+    gap: var(--gap-gallery) !important;
+    row-gap: clamp(1.75rem, 4vw, 3rem) !important;
+  }
+  .gallery-card-fluid {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+    transition: opacity 0.75s var(--ease-out-expo), transform 0.75s var(--ease-out-expo);
+  }
+  .gallery-card-fluid.is-in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-card-fluid { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* Hero → gallery fluid blend */
+  #home.hero-fluid {
+    margin-bottom: 0;
+  }
+  #home.hero-fluid .hero-blend {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: clamp(6rem, 18vw, 12rem);
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgb(var(--brand-dark) / 0.55) 45%,
+      rgb(var(--brand-dark)) 100%
+    );
+    pointer-events: none;
+    z-index: 5;
+  }
+  #gallerySection.fluid-blend-top {
+    margin-top: clamp(-3rem, -6vw, -1.5rem);
+    position: relative;
+    z-index: 6;
+  }
 
   /* Focus rings (focusRings) */
   .ux-focus-rings :focus-visible {
@@ -138,18 +238,23 @@
     padding-right: 0.25rem;
   }
 
-  /* Section fade-in on scroll */
+  /* Section fade-in on scroll — fluid */
   .ux-reveal {
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(clamp(16px, 3vw, 28px));
+    filter: blur(2px);
+    transition:
+      opacity var(--duration-slow) var(--ease-out-expo),
+      transform var(--duration-slow) var(--ease-out-expo),
+      filter var(--duration-med) var(--ease-out-soft);
   }
   .ux-reveal.is-visible {
     opacity: 1;
     transform: none;
+    filter: none;
   }
   @media (prefers-reduced-motion: reduce) {
-    .ux-reveal { opacity: 1; transform: none; transition: none; }
+    .ux-reveal { opacity: 1; transform: none; filter: none; transition: none; }
   }
 
   /* Mobile menu stagger */
@@ -435,10 +540,11 @@
 </svg>
 
 <!-- Hero -->
-<header id="home" class="relative h-[85vh] md:h-[92vh] flex flex-col justify-end px-wrap pb-16 overflow-hidden">
+<header id="home" class="hero-fluid relative h-[85vh] md:h-[92vh] flex flex-col justify-end px-wrap pb-16 overflow-hidden">
   <div class="absolute inset-0 z-0">
     <img id="heroImg" class="w-full h-full object-cover bg-zinc-900 opacity-90 transition-opacity duration-1000" src="" alt="Hero photo" />
     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-brand-dark/30 to-black/40"></div>
+    <div class="hero-blend" aria-hidden="true"></div>
   </div>
   <div class="relative z-10 max-w-7xl mx-auto w-full animate-slide-up">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-4">
@@ -450,7 +556,7 @@
 
 <main id="gallery">
   <!-- Gallery -->
-  <section id="gallerySection" class="py-24 md:py-36 px-wrap ux-reveal">
+  <section id="gallerySection" class="fluid-section fluid-blend-top px-wrap ux-reveal">
     <div class="max-w-7xl mx-auto">
       <div id="galleryHeader" class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-8 border-b border-brand-border pb-8">
         <h2 id="txt-galleryHeading" class="text-xs uppercase tracking-[0.25em] font-medium text-brand-gold">CURATED WORK</h2>
@@ -462,7 +568,7 @@
   </section>
 
   <!-- About -->
-  <section id="about" class="py-28 md:py-40 px-wrap border-t border-brand-border bg-brand-surface/30 ux-reveal">
+  <section id="about" class="fluid-section px-wrap border-t border-brand-border bg-brand-surface/30 ux-reveal">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
       <div class="md:col-span-8">
         <h3 id="txt-aboutHeading" class="text-4xl md:text-6xl lg:text-7xl font-serif leading-[1.1] tracking-tight uppercase">
@@ -479,7 +585,7 @@
   </section>
 
   <!-- Testimonials -->
-  <section id="testimonials" class="py-24 md:py-36 border-t border-brand-border overflow-hidden ux-reveal">
+  <section id="testimonials" class="fluid-section border-t border-brand-border overflow-hidden ux-reveal">
     <div class="max-w-7xl mx-auto px-wrap">
       <h2 class="text-xs uppercase tracking-[0.25em] font-medium text-brand-gold mb-12 md:mb-16">What People Say</h2>
     </div>
@@ -499,7 +605,7 @@
 </main>
 
 <!-- Footer / Contact -->
-<footer id="contact" class="px-wrap pb-16 border-t border-brand-border pt-24 md:pt-36 ux-reveal">
+<footer id="contact" class="px-wrap pb-16 border-t border-brand-border fluid-section ux-reveal">
   <div class="max-w-7xl mx-auto">
     <h2 id="txt-footerHeading" class="text-5xl md:text-8xl lg:text-9xl font-serif uppercase tracking-tighter mb-16 md:mb-24 text-brand-light/90">PORTFOLIO</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-12 py-16 md:py-20 border-b border-brand-border">
@@ -724,6 +830,9 @@
     copyToast: true,
     contactFormValidation: true,
     sectionFadeInOnScroll: true,
+    /** Convert Google Drive share links to viewable image URLs; skip when URL is already a direct image (*.jpg etc.) */
+    convertGoogleDriveLinks: true,
+    fluidSite: true,
   };
 
   const UX_FLAG_LABELS = {
@@ -746,6 +855,8 @@
     copyToast: 'Contact: toast after copy',
     contactFormValidation: 'Contact form: validation + busy state',
     sectionFadeInOnScroll: 'Global: section fade-in on scroll',
+    convertGoogleDriveLinks: 'Images: convert Google Drive links (skip *.jpg / direct files)',
+    fluidSite: 'Fluid site: clamp spacing, hero blend, smooth reveals',
   };
 
   function getUx() {
@@ -753,6 +864,59 @@
     const out = Object.assign({}, UX_DEFAULTS, saved);
     if (out.testimonialsLayout !== 'vertical') out.testimonialsLayout = 'horizontal';
     return out;
+  }
+
+  /** True when URL already points at a direct image file (skip Drive conversion). */
+  function isDirectImageUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const cleaned = url.trim().split('?')[0].split('#')[0].toLowerCase();
+    return /\.(jpe?g|png|gif|webp|avif|bmp|svg)$/i.test(cleaned);
+  }
+
+  /** Extract Google Drive file id from common share / open / uc URLs. */
+  function extractGoogleDriveId(url) {
+    if (!url) return '';
+    const u = url.trim();
+    let m = u.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    m = u.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    m = u.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) return m[1];
+    return '';
+  }
+
+  /**
+   * Resolve media URL for display:
+   * - Direct *.jpg / *.png / imgbb file links → unchanged
+   * - Google Drive share links → uc?export=view&id=… (when convertGoogleDriveLinks is on)
+   */
+  function resolveImageUrl(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    const url = raw.trim();
+    if (!url) return '';
+
+    // Always skip conversion for clear direct image files
+    if (isDirectImageUrl(url)) return url;
+
+    const ux = typeof getUx === 'function' ? getUx() : { convertGoogleDriveLinks: true };
+    if (ux.convertGoogleDriveLinks === false) return url;
+
+    const isDrive =
+      /drive\.google\.com/i.test(url) ||
+      /docs\.google\.com\/uc/i.test(url);
+
+    if (!isDrive) return url;
+
+    // Already a direct-ish uc / thumbnail link — normalize to export=view
+    const existingId = extractGoogleDriveId(url);
+    if (!existingId) return url;
+
+    if (/[?&]export=view/i.test(url) || /[?&]export=download/i.test(url)) {
+      return 'https://drive.google.com/uc?export=view&id=' + existingId;
+    }
+
+    return 'https://drive.google.com/uc?export=view&id=' + existingId;
   }
 
   const prefersReducedMotion = () =>
@@ -819,8 +983,9 @@
 
       if (data.hero) {
         const heroEl = document.getElementById('heroImg');
-        heroEl.src = data.hero;
-        document.getElementById('ogImageMeta').setAttribute('content', data.hero);
+        const heroSrc = resolveImageUrl(data.hero);
+        heroEl.src = heroSrc;
+        document.getElementById('ogImageMeta').setAttribute('content', heroSrc);
         const uxHero = getUx();
         if (uxHero.heroKenBurns && !prefersReducedMotion()) heroEl.classList.add('ken-burns');
         else heroEl.classList.remove('ken-burns');
@@ -856,7 +1021,7 @@
 
     const initials = (t.name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
     const avatarHtml = t.avatar
-      ? `<img src="${escapeHtml(t.avatar)}" alt="${escapeHtml(t.name || '')}" class="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0" />`
+      ? `<img src="${escapeHtml(resolveImageUrl(t.avatar))}" alt="${escapeHtml(t.name || '')}" class="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0" />`
       : `<div class="w-10 h-10 rounded-full border border-brand-border bg-brand-dark flex items-center justify-center text-xs text-brand-gold font-medium shrink-0">${escapeHtml(initials)}</div>`;
 
     card.innerHTML = `
@@ -1105,13 +1270,13 @@
 
     photos.forEach((photo, index) => {
       const wrap = document.createElement('div');
-      wrap.className = 'group cursor-pointer opacity-0 animate-fade-in';
-      wrap.style.animationDelay = (index * 0.08) + 's';
+      wrap.className = 'group cursor-pointer gallery-card-fluid';
+      wrap.style.transitionDelay = (Math.min(index, 12) * 0.06) + 's';
       
       wrap.innerHTML = `
         <div class="aspect-portrait overflow-hidden rounded-xl bg-zinc-900 border border-brand-border/40 shadow-2xl relative">
           <div class="absolute inset-0 skeleton"></div>
-          <img class="gallery-img w-full h-full object-cover relative z-10" src="${photo.url}" alt="${photo.name || 'Portrait'}" loading="lazy" onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none'" />
+          <img class="gallery-img w-full h-full object-cover relative z-10" src="${escapeHtml(resolveImageUrl(photo.url))}" alt="${escapeHtml(photo.name || 'Portrait')}" loading="lazy" onload="this.classList.add('loaded'); this.previousElementSibling.style.display='none'" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 flex items-end p-6">
             <span class="text-xs uppercase tracking-[0.2em] text-brand-light font-medium">${photo.name || 'Untitled'}</span>
           </div>
@@ -1121,6 +1286,21 @@
       wrap.addEventListener('click', () => openLightbox(photos, index));
       grid.appendChild(wrap);
     });
+
+    // Fluid staggered reveal for gallery cards
+    if (getUx().fluidSite !== false && 'IntersectionObserver' in window && !prefersReducedMotion()) {
+      const cardObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            cardObs.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+      grid.querySelectorAll('.gallery-card-fluid').forEach(el => cardObs.observe(el));
+    } else {
+      grid.querySelectorAll('.gallery-card-fluid').forEach(el => el.classList.add('is-in'));
+    }
   }
 
   // ============================================================
@@ -1143,7 +1323,7 @@
     lightboxIndex = (index + lightboxPhotos.length) % lightboxPhotos.length;
     const photo = lightboxPhotos[lightboxIndex];
 
-    lightboxImg.src = photo.url;
+    lightboxImg.src = resolveImageUrl(photo.url);
     lightboxCaption.textContent = photo.name || '';
 
     if (photo.instagram) {
@@ -1780,8 +1960,8 @@
       applyUxSettings();
       if (siteData.hero) {
         const heroEl = document.getElementById('heroImg');
-        heroEl.src = siteData.hero;
-        document.getElementById('ogImageMeta').setAttribute('content', siteData.hero);
+        heroEl.src = resolveImageUrl(siteData.hero);
+        document.getElementById('ogImageMeta').setAttribute('content', resolveImageUrl(siteData.hero));
         const uxHero = getUx();
         if (uxHero.heroKenBurns && !prefersReducedMotion()) heroEl.classList.add('ken-burns');
         else heroEl.classList.remove('ken-burns');
@@ -1825,6 +2005,11 @@
     const ux = getUx();
 
     document.documentElement.classList.toggle('ux-focus-rings', !!ux.focusRings);
+    document.documentElement.classList.toggle('fluid-site', ux.fluidSite !== false);
+    const home = document.getElementById('home');
+    const gal = document.getElementById('gallerySection');
+    if (home) home.classList.toggle('hero-fluid', ux.fluidSite !== false);
+    if (gal) gal.classList.toggle('fluid-blend-top', ux.fluidSite !== false);
 
     const pill = document.getElementById('navPill');
     if (pill) {
